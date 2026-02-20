@@ -1,52 +1,48 @@
 import streamlit as st
 from cifrado import cifrar_cesar, descifrar_cesar, cifrar_atbash, detectar_cifrado
 
-st.set_page_config(page_title="Cipher Pro", page_icon="🔐", layout="centered")
+st.set_page_config(page_title="Cipher Detector Pro", page_icon="🕵️")
 
-st.title("🔐 Cyber-Dashboard")
+st.title("🕵️ Detector de Cifrados Crítico")
 
-# --- SIDEBAR ---
-st.sidebar.header("Configuración")
-modo_custom = st.sidebar.toggle("Modo Personalizado")
+# --- BARRA LATERAL ---
+st.sidebar.header("🔧 Panel de Control")
+modo_custom = st.sidebar.toggle("Modo Personalizado (Números/Símbolos)")
+
 if modo_custom:
-    alfabeto_input = st.sidebar.text_input("Abecedario personalizado:", value="1234abcd")
+    alfabeto_input = st.sidebar.text_input("Alfabeto manual:", value="1234abcd")
     con_enie = False
 else:
     alfabeto_input = None
-    con_enie = st.sidebar.checkbox("Usar Ñ", value=True)
+    con_enie = st.sidebar.checkbox("Incluir letra Ñ", value=True)
 
-# --- ENTRADA ---
-texto_input = st.text_area("Entrada:", placeholder="Escribe tu mensaje...")
-desp_manual = st.number_input("Desplazamiento César (Manual):", 1, 30, 1)
+# --- ÁREA DE TRABAJO ---
+st.subheader("📝 Entrada de Mensaje")
+texto_input = st.text_input("Texto a analizar:", placeholder="Ej: Owsi o Sloz").strip()
 
-c1, c2, c3 = st.columns(3)
-with c1: btn_cifrar = st.button("Cifrar", use_container_width=True)
-with c2: btn_atbash = st.button("Atbash", use_container_width=True)
-with c3: btn_auto = st.button("AUTO-DETECTAR", type="primary", use_container_width=True)
+# Controles manuales rápidos
+with st.expander("Controles Manuales (Cifrado rápido)"):
+    col_d, col_b = st.columns([1,2])
+    d_manual = col_d.number_input("Desplazamiento:", 1, 27, 8)
+    if col_b.button("Generar César Manual"):
+        st.code(cifrar_cesar(texto_input, d_manual, alfabeto_input, con_enie))
 
 st.divider()
 
-# --- LÓGICA ---
-if texto_input:
-    if btn_cifrar:
-        res = cifrar_cesar(texto_input, desp_manual, alfabeto_input, con_enie)
-        st.success(f"Cifrado César: {res}")
+# --- DETECCIÓN AUTOMÁTICA ---
+if st.button("🚀 EJECUTAR ANÁLISIS AUTOMÁTICO", type="primary", use_container_width=True):
+    if texto_input:
+        resultado_tipo = detectar_cifrado(texto_input, alfabeto_input, con_enie)
         
-    elif btn_atbash:
-        res = cifrar_atbash(texto_input, alfabeto_input, con_enie)
-        st.success(f"Resultado Atbash: {res}")
+        st.subheader("🔍 Resultados del Escaneo")
+        st.info(f"Método Identificado: **{resultado_tipo.upper()}**")
         
-    elif btn_auto:
-        tipo = detectar_cifrado(texto_input, alfabeto_input, con_enie)
-        st.info(f"Método Detectado: {tipo}")
-        
-        if "César" in tipo:
-            d = int(tipo.split()[-1])
-            descifrado = descifrar_cesar(texto_input, d, alfabeto_input, con_enie)
+        if "CÉSAR" in resultado_tipo.upper():
+            desp = int(resultado_tipo.split()[-1])
+            descifrado = descifrar_cesar(texto_input, desp, alfabeto_input, con_enie)
         else:
             descifrado = cifrar_atbash(texto_input, alfabeto_input, con_enie)
             
-        st.success(f"Texto Descifrado: {descifrado}")
-else:
-    if btn_cifrar or btn_atbash or btn_auto:
-        st.warning("Por favor ingresa un texto.")
+        st.success(f"Texto Descifrado: **{descifrado}**")
+    else:
+        st.error("Debes ingresar un texto para analizar.")
