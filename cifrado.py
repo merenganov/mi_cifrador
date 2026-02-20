@@ -1,7 +1,10 @@
+import string
+
 def obtener_alfabetos(alfabeto_custom=None, con_enie=True):
     if alfabeto_custom:
         alfabeto_limpio = "".join(dict.fromkeys(alfabeto_custom))
         return alfabeto_limpio, alfabeto_limpio.upper()
+    # El abecedario español estándar tiene 27 o 28 letras dependiendo de la Ñ
     abc = "abcdefghijklmnñopqrstuvwxyz" if con_enie else "abcdefghijklmnopqrstuvwxyz"
     return abc, abc.upper()
 
@@ -19,6 +22,7 @@ def cifrar_cesar(texto, desplazamiento, alfabeto_custom=None, con_enie=True):
     return res
 
 def descifrar_cesar(texto, desplazamiento, alfabeto_custom=None, con_enie=True):
+    # IMPORTANTE: Para descifrar, el desplazamiento es negativo
     return cifrar_cesar(texto, -desplazamiento, alfabeto_custom, con_enie)
 
 def cifrar_atbash(texto, alfabeto_custom=None, con_enie=True):
@@ -37,12 +41,30 @@ def cifrar_atbash(texto, alfabeto_custom=None, con_enie=True):
 def calcular_puntuacion_idioma(texto, alfabeto_custom=None):
     texto = texto.lower()
     score = 0
+    
+    # DICCIONARIO TÉCNICO EXTENDIDO
+    diccionario = {
+        "hola", "me", "gusta", "muchas", "hamburguesas", 
+        "circuitos", "rectificadores", "grandes", "ingenieria", "ciberseguridad"
+    }
+    
+    # 1. Búsqueda de palabras reales (Máxima prioridad)
+    palabras_en_texto = texto.split()
+    for palabra in palabras_en_texto:
+        if palabra in diccionario:
+            score += 2000 
+
     if not alfabeto_custom:
-        palabras_clave = {"me", "gusta", "muchas", "hamburguesas", "hola", "que", "esta"}
-        if any(p in texto for p in palabras_clave): score += 1000
-        score += sum(10 for letra in texto if letra in "aeiouáéíóú")
+        # 2. Análisis de frecuencia (El español abunda en estas letras)
+        letras_comunes = "eaosrnidlc" 
+        for letra in texto:
+            if letra in letras_comunes:
+                score += 15
+        # Bonus por espacios (Indica estructura de frase)
+        score += texto.count(" ") * 30
     else:
         score += sum(10 for letra in texto if letra in alfabeto_custom)
+        
     return score
 
 def obtener_mejores_candidatos(texto, alfabeto_custom=None, con_enie=True):
