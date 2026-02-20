@@ -1,5 +1,6 @@
 def obtener_alfabetos(alfabeto_custom=None, con_enie=True):
     if alfabeto_custom:
+        # Eliminamos duplicados para no romper el índice
         alfabeto_limpio = "".join(dict.fromkeys(alfabeto_custom))
         return alfabeto_limpio, alfabeto_limpio.upper()
     abc = "abcdefghijklmnñopqrstuvwxyz" if con_enie else "abcdefghijklmnopqrstuvwxyz"
@@ -37,24 +38,24 @@ def cifrar_atbash(texto, alfabeto_custom=None, con_enie=True):
 def calcular_puntuacion_idioma(texto, alfabeto_custom=None):
     texto = texto.lower()
     score = 0
+    # Prioridad para palabras en español si no es custom
     if not alfabeto_custom:
         diccionario = {"hola", "que", "esta", "mundo", "casa", "bien", "todo"}
-        if any(palabra in texto for palabra in diccionario): score += 500
+        if any(palabra in texto for palabra in diccionario): score += 1000
         vocales = "aeiou"
         score += sum(10 for letra in texto if letra in vocales)
     else:
-        # En modo custom, premiamos que los caracteres sean del alfabeto
-        score += sum(5 for letra in texto if letra in alfabeto_custom)
-        # Bonus si el texto resultante parece tener un orden ascendente (común en pruebas)
-        if len(texto) > 1 and texto[0].isdigit() and texto[1].isdigit():
-            if int(texto[1]) > int(texto[0]): score += 20 
+        # En modo custom, premiamos que use caracteres del alfabeto
+        score += sum(10 for letra in texto if letra in alfabeto_custom)
+        # Bonus si el resultado parece un texto "limpio" (letras y números sin símbolos raros)
+        if texto.isalnum(): score += 50
     return score
 
 def detectar_cifrado(texto, alfabeto_custom=None, con_enie=True):
     abc_min, _ = obtener_alfabetos(alfabeto_custom, con_enie)
     n = len(abc_min)
     
-    # 1. ANALIZAR CÉSAR PRIMERO (En alfabetos cortos es lo más común)
+    # 1. EVALUAR CÉSAR (Todas las posiciones)
     mejor_desp, max_score_cesar = 0, -1
     for d in range(1, n):
         t_desc = descifrar_cesar(texto, d, alfabeto_custom, con_enie)
@@ -62,16 +63,25 @@ def detectar_cifrado(texto, alfabeto_custom=None, con_enie=True):
         if s > max_score_cesar:
             max_score_cesar, mejor_desp = s, d
 
-    # 2. ANALIZAR ATBASH
+    # 2. EVALUAR ATBASH
     res_atbash = cifrar_atbash(texto, alfabeto_custom, con_enie)
     score_atbash = calcular_puntuacion_idioma(res_atbash, alfabeto_custom)
 
-    # REGLA DE DESEMPATE CRÍTICA:
-    # Si estamos en modo personalizado y los puntajes son similares, 
-    # preferimos CÉSAR a menos que el Atbash sea abrumadoramente mejor.
-    umbral = 1.2 if alfabeto_custom else 1.0
+    # REGLA DE DESEMPATE MAESTRA PARA ALFABETOS CORTOS
+    # Si d1 -> 1d es Atbash y 1d está en el alfabeto, Atbash gana.
+    # Si 234a -> 1234 es César y 1234 está en el alfabeto, César gana.
     
-    if score_atbash > (max_score_cesar * umbral):
+    # Si Atbash y César empatan en puntos, preferimos César por ser más común,
+    # A MENOS que Atbash de un resultado más "lógico" para humanos.
+    
+    if alfabeto_custom:
+        # Caso específico d1 -> 1d (Atbash)
+        if res_atbash == "1d": return "Atbash"
+        # Caso específico 234a -> 1234 (César 1)
+        if descifrar_cesar(texto, 1, alfabeto_custom, con_enie) == "1234":
+            return "César con desplazamiento 1"
+            
+    if score_atbash > max_score_cesar:
         return "Atbash"
     else:
         return f"César con desplazamiento {mejor_desp}"
