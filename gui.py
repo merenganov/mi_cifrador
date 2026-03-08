@@ -8,7 +8,7 @@ class DashboardCifrado(ctk.CTk):
     def __init__(self):
         super().__init__()
 
-        self.title("CYBER-DASHBOARD // SISTEMA DE CIFRADO")
+        self.title("CYBER-DASHBOARD. // SISTEMA DE CIFRADO")
         self.geometry("1000x750")
 
         # Layout Principal

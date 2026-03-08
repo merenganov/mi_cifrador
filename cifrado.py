@@ -44,9 +44,76 @@ def calcular_puntuacion_idioma(texto, alfabeto_custom=None):
     
     # DICCIONARIO TÉCNICO EXTENDIDO
     diccionario = {
-        "hola", "me", "gusta", "muchas", "hamburguesas", 
-        "circuitos", "rectificadores", "grandes", "ingenieria", "ciberseguridad"
-    }
+     # palabras comunes
+     "de","la","el","los","las","un","una","unos","unas",
+     "es","son","en","para","con","sin","por","porque",
+     "que","cual","como","cuando","donde","quien",
+     "este","esta","estos","estas",
+     "su","sus","del","al",
+
+     # palabras de examen
+     "definir","define","explicar","explica","menciona",
+     "indica","describe","selecciona","identifica",
+     "correcto","incorrecto","verdadero","falso",
+     "ejemplo","funcion","proceso","metodo",
+     "sistema","concepto","caracteristica",
+
+     # ciberseguridad general
+     "seguridad","ciberseguridad","seguridad_informatica",
+     "proteccion","riesgo","amenaza","vulnerabilidad",
+     "ataque","defensa","seguro","incidente",
+     "prevencion","deteccion","monitoreo",
+
+     # triada cia
+     "confidencialidad","integridad","disponibilidad",
+
+     # autenticacion y acceso
+     "autenticacion","autorizacion","acceso",
+     "usuario","administrador","permiso",
+     "credenciales","identidad","login","password",
+     "contraseña","token",
+
+     # criptografia
+     "criptografia","cifrado","descifrado",
+     "encriptacion","desencriptacion",
+     "clave","llave","hash","algoritmo",
+     "firma","digital","certificado",
+
+     # ataques
+     "malware","virus","gusano","troyano",
+     "phishing","ransomware","spyware",
+     "ataque","fuerza","bruta","inyeccion",
+     "sql","ddos","spoofing",
+
+     # redes
+     "red","redes","internet","protocolo",
+     "tcp","ip","http","https","dns",
+     "router","switch","servidor","cliente",
+     "conexion","paquete","puerto",
+
+     # seguridad de red
+     "firewall","vpn","segmentacion",
+     "filtrado","monitorizacion",
+
+     # datos
+     "datos","informacion","base","datos",
+     "almacenamiento","backup","respaldo",
+     "recuperacion",
+
+     # ingenieria social
+     "ingenieria","social","engaño",
+     "manipulacion","usuario","confianza",
+
+     # software y sistemas
+     "sistema","operativo","software",
+     "hardware","aplicacion","programa",
+     "actualizacion","parche","configuracion",
+
+      # otros conceptos
+     "politica","seguridad","auditoria",
+     "control","gestion","riesgo",
+     "evaluacion","analisis","proteccion"
+     }
     
     # 1. Búsqueda de palabras reales (Máxima prioridad)
     palabras_en_texto = texto.split()
