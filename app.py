@@ -2,7 +2,7 @@ import streamlit as st
 from cifrado import cifrar_cesar, descifrar_cesar, cifrar_atbash, obtener_mejores_candidatos
 
 st.set_page_config(page_title="Cipher Dashboard Pro", layout="wide")
-st.title("🔐 Cyber-Dashboard: Análisis Comparativo")
+st.title("🔐 Cyber-Dashboard: Análisis Comparativo.")
 
 # --- Configuración ---
 st.sidebar.header("🛠️ Configuración")
